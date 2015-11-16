@@ -1,3 +1,5 @@
+"""Utility functionality for Alexandra"""
+
 import base64
 import os.path
 import urlparse
@@ -5,13 +7,48 @@ import urllib2
 
 from datetime import datetime
 
-from werkzeug.wrappers import Request, Response
 from OpenSSL import crypto
 
 
 # We don't want to check the certificate every single time. Store for
 # as long as they are valid.
 _cache = {}
+
+
+def build_response(text=None, ssml=None, session=None, reprompt=False):
+    """ Build a dict containing a valid response to an Alexa request.
+
+    If speech output is desired, either of `text` or `ssml` should
+    be specified.
+
+    :param text: Plain text speech output to be said by Alexa device.
+    :param ssml: Speech output in SSML form.
+    :param session: Dict containing key, value pairs to attach to
+                    user's session.
+    :param reprompt: If true, one of `text`/`ssml` should be set,
+                     and will be used as the reprompt speech
+    """
+
+    obj = {
+        'version': '1.0',
+        'shouldEndSession': session is None
+    }
+
+    if text or ssml:
+        if text:
+            output = {'type': 'TEXT', 'text': text}
+        elif ssml:
+            output = {'type': 'SSML', 'ssml': ssml}
+
+        if reprompt:
+            obj['reprompt'] = {'outputSpeech': output}
+        else:
+            obj['outputSpeech'] = output
+
+    if session is not None:
+        obj['sessionAttributes'] = session
+
+    return obj
 
 
 def validate_request_timestamp(body):

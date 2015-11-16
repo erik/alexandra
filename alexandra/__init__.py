@@ -1,23 +1,72 @@
-import base64
-import os.path
-import urlparse
-import urllib2
+import json
 
-from datetime import datetime
-from functools import wraps
+from werkzeug.wrappers import Request, Response
+from werkzeug.exceptions import HTTPException, abort
 
-import flask
-from OpenSSL import crypto
+import alexandra.util as util
 
 
 class Alexa:
-    def __init__(self, app=None):
-        self.app = app
+    def __init__(self):
         self.intent_map = {}
-        self.launch_handlers = []
+        self.launch_fn = None
+        self.unknown_intent_fn = self._unknown_intent
+        self.session_end_fn = None
 
-        return None
+    def _unknown_intent(self):
+        return Alexa.build_response(text="I'm not sure what this means.")
 
+    @Request.application
+    def __call__(self, request):
+        return self.wsgi_app(request)
+
+    def wsgi_app(self, request):
+        try:
+            if request.method != 'POST':
+                abort(400)
+
+            try:
+                body = json.loads(request.data)
+            except ValueError:
+                abort(400)
+
+            if not util.validate_request_certificate(request) or \
+               not util.validate_request_timestamp(body):
+                abort(400)
+
+            resp_obj = self.dispatch_request(body)
+            return Response(response=json.dumps(resp_obj, indent=4),
+                            status=200,
+                            mimetype='application/json')
+
+        except HTTPException, exc:
+            return exc
+
+    def dispatch_request(self, body):
+        req_type = body['request']['type']
+
+        if req_type == 'LaunchRequest' and self.launch_fn:
+            return self.launch_fn()
+
+        elif req_type == 'IntentRequest':
+            intent = body['request']['intent']['name']
+            intent_fn = self.intent_map.get(intent, self.unknown_intent_fn)
+
+            slots = {
+                slot['name']: slot['value']
+                for _, slot in
+                body['request']['intent']['slots'].iteritems()
+            }
+
+            return intent_fn(slots, body.get('session'))
+
+        elif req_type == 'SessionEndedRequest':
+            if self.session_end_fn:
+                return self.session_end_fn()
+
+            return Alexa.build_response()
+
+        abort(400)
 
     @staticmethod
     def build_response(text=None, ssml=None, session=None, reprompt=False):
@@ -55,27 +104,13 @@ class Alexa:
 
         return obj
 
-    def validate_origin(self, func):
-        """ Ensure it's actually Amazon sending us this request. """
-
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            if not _validate_request_certificate(self.app.request) or \
-               not _validate_request_timestamp(self.app.request):
-                flask.abort(400)
-
-            return func(*args, **kwargs)
-
-        return wrapper
-
     def launch(self, func):
         """Decorator to register a function to be called whenever the
         app receives a LaunchRequest (which happens when someone
         invokes your skill without specifying an intent).
         """
 
-        self.launch_handlers.append(func)
-
+        self.launch_fn = func
         return func
 
     def intent(self, name):
@@ -88,92 +123,10 @@ class Alexa:
 
         return _decorator
 
+    def unknown_intent(self, func):
+        self.unknown_intent_fn = func
+        return func
 
-    def route(self):
-        pass
-
-
-def _validate_request_timestamp(request):
-    """Ensure the request's timestamp doesn't fall outside of the
-    app's specified tolerance
-    """
-
-    body = request.get_json(force=True)
-    time_str = body.get('request', {}).get('timestamp')
-
-    if not time_str:
-        return False
-
-    req_ts = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%SZ")
-    diff = (datetime.utcnow() - req_ts).total_seconds()
-
-    if abs(diff) > 150:
-        return False
-
-    return True
-
-
-def _validate_request_certificate(request):
-    # Make sure we have the appropriate headers.
-    if 'SignatureCertChainUrl' not in request.headers or \
-       'Signature' not in request.headers:
-        return False
-
-    cert_url = request.headers['SignatureCertChainUrl']
-    sig = base64.b64decode(request.headers['Signature'])
-
-    cert = _get_certificate(cert_url)
-    if not cert:
-        return False
-
-    if not crypto.verify(cert, sig, request.data, 'sha1'):
-        return False
-
-    return True
-
-
-def _get_certificate(cert_url):
-    """Download and validate a specified Amazon PEM file."""
-
-    url = urlparse.urlparse(cert_url)
-    host = url.netloc.lower()
-    path = os.path.normpath(url.path)
-
-    # Sanity check location so we don't get some random person's cert.
-    if url.scheme != 'https' or \
-       host not in ['s3.amazonaws.com', 's3.amazonaws.com:443'] or \
-       not path.startswith('/echo.api/'):
-        return
-
-    resp = urllib2.urlopen(cert_url)
-    if resp.getcode() != 200:
-        return
-
-    cert = crypto.load_certificate(crypto.FILETYPE_PEM, resp.read())
-
-    if cert.has_expired() or cert.get_subject().CN != 'echo-api.amazon.com':
-        return
-
-    return cert
-
-
-app = flask.Flask(__name__)
-alexa = Alexa(app)
-
-
-@alexa.launch
-def launch_request():
-    pass
-
-
-@alexa.intent('GreetPerson')
-def skip_media(slots, session):
-    name = slots.get('Name', 'World')
-
-    alexa.build_response(text='Hello, ' + name)
-
-
-@app.route('/', methods=['POST'])
-@alexa.validate_origin
-def index():
-    pass
+    def session_end(self, func):
+        self.session_end_fn = func
+        return func

@@ -14,7 +14,7 @@ app = alexandra.Application()
 
 @app.launch
 def launch_handler():
-    return alexandra.build_response(
+    return alexandra.respond(
         text='What would you like to do?',
         reprompt=True
     )
@@ -24,7 +24,7 @@ def launch_handler():
 def set_name_intent(slots, session):
     name = slots['name']
 
-    return alexandra.build_response(
+    return alexandra.respond(
         text="Okay, I won't forget you, %s" % name,
         session={'name': name}
     )
@@ -34,12 +34,12 @@ def get_name_intent(slots, session):
     name = session.get('name')
 
     if name:
-        return alexandra.build_response(
+        return alexandra.respond(
             text='You are %s, of course!' % name
             session=session
         )
 
-    return alexandra.build_response(
+    return alexandra.respond(
         text="We haven't met yet! What's your name?",
         reprompt=True
     )

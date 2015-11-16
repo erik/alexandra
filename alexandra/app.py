@@ -1,6 +1,6 @@
 from werkzeug.exceptions import abort
 
-from alexandra.util import build_response
+from alexandra.util import respond
 from alexandra.wsgi import WsgiApp
 
 class Application:
@@ -41,7 +41,7 @@ class Application:
             if self.session_end_fn:
                 return self.session_end_fn()
 
-            return build_response()
+            return respond(text='')
 
         abort(400)
 
@@ -73,4 +73,4 @@ class Application:
         return func
 
     def _unknown_intent(self):
-        return Alexa.build_response(text="I'm not sure what this means.")
+        return respond(text="I'm not sure what this means.")

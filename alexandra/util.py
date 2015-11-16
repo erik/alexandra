@@ -15,7 +15,7 @@ from OpenSSL import crypto
 _cache = {}
 
 
-def build_response(text=None, ssml=None, session=None, reprompt=False):
+def respond(text=None, ssml=None, session=None, reprompt=False):
     """ Build a dict containing a valid response to an Alexa request.
 
     If speech output is desired, either of `text` or `ssml` should

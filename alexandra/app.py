@@ -13,6 +13,12 @@ class Application:
     def create_wsgi_app(self):
         return WsgiApp(self)
 
+    def run_debug(self, host, port):
+        from werkzeug.serving import run_simple
+
+        app = self.create_wsgi_app()
+        run_simple(host, port, app, use_reloader=True, use_debugger=True)
+
     def dispatch_request(self, body):
         req_type = body['request']['type']
 

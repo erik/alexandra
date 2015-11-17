@@ -11,36 +11,33 @@ import alexandra
 
 
 app = alexandra.Application()
+name_map = {}
+
 
 @app.launch
 def launch_handler():
     return alexandra.respond(
-        text='What would you like to do?',
-        reprompt=True
+        reprompt_text='What would you like to do?'
     )
 
 
 @app.intent('MyNameIs')
 def set_name_intent(slots, session):
     name = slots['Name']
+    name_map[session.user_id] = name
 
-    return alexandra.respond(
-        text="Okay, I won't forget you, %s" % name,
-        session={'name': name},
-        end_session=False
-    )
+    return alexandra.respond(text="Okay, I won't forget you, %s" % name)
+
 
 @app.intent('WhoAmI')
 def get_name_intent(slots, session):
-    name = session.get('name')
+    name = name_map.get(session.user_id)
 
     if name:
-        return alexandra.respond(
-            text='You are %s, of course!' % name,
-            end_session=False
-        )
+        return alexandra.respond(text='You are %s, of course!' % name)
 
     return alexandra.respond(
+        text="I don't know your name!",
         reprompt_text="We haven't met yet! What's your name?",
         end_session=False
     )

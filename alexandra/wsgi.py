@@ -7,8 +7,9 @@ import alexandra.util as util
 
 
 class WsgiApp:
-    def __init__(self, alexa):
+    def __init__(self, alexa, validate_requests):
         self.alexa = alexa
+        self.validate = validate_requests
 
     @Request.application
     def __call__(self, request):
@@ -24,9 +25,10 @@ class WsgiApp:
             except ValueError:
                 abort(400)
 
-            if not util.validate_request_certificate(request) or \
-               not util.validate_request_timestamp(body):
-                abort(400)
+            if self.validate:
+                if not util.validate_request_certificate(request) or \
+                   not util.validate_request_timestamp(body):
+                    abort(400)
 
             resp_obj = self.alexa.dispatch_request(body)
             return Response(response=json.dumps(resp_obj, indent=4),

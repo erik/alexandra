@@ -15,7 +15,8 @@ from OpenSSL import crypto
 _cache = {}
 
 
-def respond(text=None, ssml=None, session=None, reprompt=False):
+def respond(text=None, ssml=None, session_attrs=None, reprompt_text=None,
+            reprompt_ssml=None, end_session=True):
     """ Build a dict containing a valid response to an Alexa request.
 
     If speech output is desired, either of `text` or `ssml` should
@@ -24,37 +25,44 @@ def respond(text=None, ssml=None, session=None, reprompt=False):
     :param text: Plain text speech output to be said by Alexa device.
     :param ssml: Speech output in SSML form.
     :param session: Dict containing key, value pairs to attach to
-                    user's session.
-    :param reprompt: If true, one of `text`/`ssml` should be set,
-                     and will be used as the reprompt speech
+        user's session.
+    :param end_session: Should the session be terminated after this response?
+    :param reprompt_text, reprompt_ssml: Works the same as
+        `text`/`ssml`, but instead sets the reprompting speech output.
     """
 
     obj = {
         'version': '1.0',
-        'shouldEndSession': False,
+        'shouldEndSession': end_session,
         'response': {}
     }
 
-    if text or ssml:
-        if text:
-            output = {'type': 'PlainText', 'text': text}
-        elif ssml:
-            output = {'type': 'SSML', 'ssml': ssml}
+    output = {}
+    if text:
+        output = {'type': 'PlainText', 'text': text}
+    elif ssml:
+        output = {'type': 'SSML', 'ssml': ssml}
 
-        if reprompt:
-            obj['response']['reprompt'] = {'outputSpeech': output}
-        else:
-            obj['response']['outputSpeech'] = output
+    obj['response']['outputSpeech'] = output
 
-    if session is not None:
-        obj['sessionAttributes'] = session
+    reprompt_output = None
+    if reprompt_text:
+        reprompt_output = {'type': 'PlainText', 'text': reprompt_text}
+    elif reprompt_ssml:
+        reprompt_output = {'type': 'SSML', 'ssml': reprompt_ssml}
+
+    if reprompt_output:
+        obj['response']['reprompt'] = {'outputSpeech': reprompt_output}
+
+    if session_attrs is not None:
+        obj['sessionAttributes'] = session_attrs
 
     return obj
 
 
 def validate_request_timestamp(body):
     """Ensure the request's timestamp doesn't fall outside of the
-    app's specified tolerance
+    app's specified tolerance.
     """
 
     time_str = body.get('request', {}).get('timestamp')

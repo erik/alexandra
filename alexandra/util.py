@@ -37,13 +37,12 @@ def respond(text=None, ssml=None, session_attrs=None, reprompt_text=None,
         'response': {}
     }
 
-    output = {}
     if text:
-        output = {'type': 'PlainText', 'text': text}
+        obj['response']['outputSpeech'] = {'type': 'PlainText', 'text': text}
     elif ssml:
-        output = {'type': 'SSML', 'ssml': ssml}
-
-    obj['response']['outputSpeech'] = output
+        obj['response']['outputSpeech'] = {'type': 'SSML', 'ssml': ssml}
+    else:
+        obj['response']['outputSpeech'] = {'type': 'PlainText', 'text': ''}
 
     reprompt_output = None
     if reprompt_text:

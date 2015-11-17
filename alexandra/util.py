@@ -84,10 +84,15 @@ def validate_request_certificate(request):
 
     cert = _get_certificate(cert_url)
 
-    if cert and crypto.verify(cert, sig, request.data, 'sha1'):
-        return True
+    if not cert:
+        return False
 
-    return False
+    try:
+        # ... wtf kind of API decision is this
+        crypto.verify(cert, sig, request.data, 'sha1')
+        return True
+    except:
+        return False
 
 
 def _get_certificate(cert_url):

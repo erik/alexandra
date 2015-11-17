@@ -27,4 +27,5 @@ class Session:
     def get(self, attr, default=None):
         """Get an attribute defined by this session"""
 
-        return self.obj['attributes'].get(attr, default)
+        attrs = self.obj.get('attributes') or {}
+        return attrs.get(attr, default)

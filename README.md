@@ -35,7 +35,7 @@ def get_name_intent(slots, session):
 
     if name:
         return alexandra.respond(
-            text='You are %s, of course!' % name
+            text='You are %s, of course!' % name,
             session=session
         )
 

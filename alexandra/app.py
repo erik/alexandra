@@ -32,7 +32,7 @@ class Application:
             slots = {
                 slot['name']: slot['value']
                 for _, slot in
-                body['request']['intent']['slots'].iteritems()
+                body['request']['intent'].get('slots', {}).iteritems()
             }
 
             return intent_fn(slots, body.get('session'))

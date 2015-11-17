@@ -31,19 +31,20 @@ def respond(text=None, ssml=None, session=None, reprompt=False):
 
     obj = {
         'version': '1.0',
-        'shouldEndSession': session is None
+        'shouldEndSession': False,
+        'response': {}
     }
 
     if text or ssml:
         if text:
-            output = {'type': 'TEXT', 'text': text}
+            output = {'type': 'PlainText', 'text': text}
         elif ssml:
             output = {'type': 'SSML', 'ssml': ssml}
 
         if reprompt:
-            obj['reprompt'] = {'outputSpeech': output}
+            obj['response']['reprompt'] = {'outputSpeech': output}
         else:
-            obj['outputSpeech'] = output
+            obj['response']['outputSpeech'] = output
 
     if session is not None:
         obj['sessionAttributes'] = session

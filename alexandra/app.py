@@ -1,5 +1,6 @@
 from werkzeug.exceptions import abort
 
+from alexandra.session import Session
 from alexandra.util import respond
 from alexandra.wsgi import WsgiApp
 
@@ -48,7 +49,9 @@ class Application:
                 body['request']['intent'].get('slots', {}).iteritems()
             }
 
-            return intent_fn(slots, body.get('session'))
+            session = Session(body.get('session'))
+
+            return intent_fn(slots, session)
 
         elif req_type == 'SessionEndedRequest':
             if self.session_end_fn:

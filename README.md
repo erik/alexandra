@@ -22,11 +22,12 @@ def launch_handler():
 
 @app.intent('MyNameIs')
 def set_name_intent(slots, session):
-    name = slots['name']
+    name = slots['Name']
 
     return alexandra.respond(
         text="Okay, I won't forget you, %s" % name,
-        session={'name': name}
+        session={'name': name},
+        end_session=False
     )
 
 @app.intent('WhoAmI')
@@ -36,14 +37,15 @@ def get_name_intent(slots, session):
     if name:
         return alexandra.respond(
             text='You are %s, of course!' % name,
-            session=session
+            end_session=False
         )
 
     return alexandra.respond(
-        text="We haven't met yet! What's your name?",
-        reprompt=True
+        reprompt_text="We haven't met yet! What's your name?",
+        end_session=False
     )
 
-if __name__ = '__main__':
-    app.run_debug('127.0.0.1', 8080)
+
+if __name__ == '__main__':
+    app.run_debug('0.0.0.0', 8080)
 ```

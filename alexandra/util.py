@@ -72,7 +72,9 @@ def validate_request_timestamp(body):
 
 
 def validate_request_certificate(request):
-    """ """
+    """Ensure that the certificate and signature specified in the
+    request headers are truely from Amazon and correctly verify.
+    """
 
     # Make sure we have the appropriate headers.
     if 'SignatureCertChainUrl' not in request.headers or \

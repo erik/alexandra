@@ -34,7 +34,8 @@ class Application:
         run_simple(host, port, app, use_reloader=True, use_debugger=True)
 
     def dispatch_request(self, body):
-        """Called by WsgiApp """
+        """Called by WsgiApp"""
+
         req_type = body['request']['type']
         session = Session(body.get('session', {}))
 

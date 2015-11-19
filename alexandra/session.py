@@ -1,8 +1,14 @@
+import json
+
+
 class Session:
     """FIXME: Is this class redundant? It's suspiciously simple."""
 
     def __init__(self, session_obj):
         self.obj = session_obj
+
+    def __repr__(self):
+        return '<Session %s>' % json.dumps(self.obj)
 
     @property
     def is_new(self):

@@ -97,6 +97,9 @@ class Application:
 
         # nested decorator so we can have params.
         def _decorator(func):
+            if func.func_code.co_argcount not in [0, 2]:
+                raise ValueError("expected 0 or 2 argument function")
+
             self.intent_map[intent_name] = func
             return func
 

@@ -4,12 +4,13 @@ from alexandra.session import Session
 from alexandra.util import respond
 from alexandra.wsgi import WsgiApp
 
+
 class Application:
     def __init__(self):
         self.intent_map = {}
-        self.launch_fn = None
-        self.unknown_intent_fn = self._default_unknown_intent
-        self.session_end_fn = None
+        self.unknown_intent_fn = lambda x, y: respond(text='unknown intent')
+        self.launch_fn = lambda _: respond
+        self.session_end_fn = respond
 
 
     def create_wsgi_app(self, validate_requests=True):
@@ -35,9 +36,10 @@ class Application:
     def dispatch_request(self, body):
         """Called by WsgiApp """
         req_type = body['request']['type']
+        session = Session(body.get('session', {}))
 
-        if req_type == 'LaunchRequest' and self.launch_fn:
-            return self.launch_fn()
+        if req_type == 'LaunchRequest':
+            return self.launch_fn(session)
 
         elif req_type == 'IntentRequest':
             intent = body['request']['intent']['name']
@@ -49,15 +51,10 @@ class Application:
                 body['request']['intent'].get('slots', {}).iteritems()
             }
 
-            session = Session(body.get('session'))
-
             return intent_fn(slots, session)
 
         elif req_type == 'SessionEndedRequest':
-            if self.session_end_fn:
-                return self.session_end_fn()
-
-            return respond(text='')
+            return self.session_end_fn()
 
         abort(400)
 
@@ -65,6 +62,12 @@ class Application:
         """Decorator to register a function to be called whenever the
         app receives a LaunchRequest (which happens when someone
         invokes your skill without specifying an intent).
+
+        ```
+        @alexa_app.launch
+        def launch_handler(session):
+            pass
+        ```
         """
 
         self.launch_fn = func
@@ -105,6 +108,3 @@ class Application:
 
         self.session_end_fn = func
         return func
-
-    def _default_unknown_intent(self):
-        return respond(text="I'm not sure what this means.")

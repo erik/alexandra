@@ -51,7 +51,10 @@ class Application:
                 body['request']['intent'].get('slots', {}).iteritems()
             }
 
-            return intent_fn(slots, session)
+            if intent_fn.func_code.co_argcount == 2:
+                return intent_fn(slots, session)
+
+            return intent_fn()
 
         elif req_type == 'SessionEndedRequest':
             return self.session_end_fn()
@@ -74,13 +77,20 @@ class Application:
         return func
 
     def intent(self, intent_name):
-        """Decorator to register a handler for the given intent. The
-        decorated function should take two arguments: a map containing
-        the slots in the IntentRequest, and a Session object.
+        """Decorator to register a handler for the given intent.
+
+        The decorated function can either:
+
+        - have two arguments: (slot_dictionary, session_obj).
+        - have zero arguments.
 
         ```
         @alexa_app.intent('FooBarBaz')
         def foo_bar_baz_intent(slots, session):
+            pass
+
+        @alexa_app.intent('NullaryIntent')
+        def nullary_intent():
             pass
         ```
         """

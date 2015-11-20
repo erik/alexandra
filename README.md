@@ -1,9 +1,12 @@
 # alexandra
 
-Python support for Amazon Alexa devices.
+Minimal library to remove the tedious boilerplate-y parts of writing Alexa
+skills.
 
-Super duper in progress, but here's the gist:
+Alexandra can be used as part of an AWS lambda function or a self-hosted
+server. There's a builtin WSGI app if you're in to that kind of thing.
 
+## example
 
 ```python
 

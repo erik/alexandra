@@ -73,13 +73,11 @@ class Application:
     def launch(self, func):
         """Decorator to register a function to be called whenever the
         app receives a LaunchRequest (which happens when someone
-        invokes your skill without specifying an intent).
+        invokes your skill without specifying an intent). ::
 
-        ```
-        @alexa_app.launch
-        def launch_handler(session):
-            pass
-        ```
+            @alexa_app.launch
+            def launch_handler(session):
+                pass
         """
 
         self.launch_fn = func
@@ -91,17 +89,15 @@ class Application:
         The decorated function can either:
 
         - have two arguments: (slot_dictionary, session_obj).
-        - have zero arguments.
+        - have zero arguments. ::
 
-        ```
-        @alexa_app.intent('FooBarBaz')
-        def foo_bar_baz_intent(slots, session):
-            pass
+            @alexa_app.intent('FooBarBaz')
+            def foo_bar_baz_intent(slots, session):
+                pass
 
-        @alexa_app.intent('NullaryIntent')
-        def nullary_intent():
-            pass
-        ```
+            @alexa_app.intent('NoArgs')
+            def noargs_intent():
+                pass
         """
 
         # nested decorator so we can have params.

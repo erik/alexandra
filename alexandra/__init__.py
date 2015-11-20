@@ -1,3 +1,9 @@
+"""
+Python support for Alexa applications.
+
+Because like everything Amazon it involves a ton of tedious boilerplate.
+"""
+
 import logging
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 

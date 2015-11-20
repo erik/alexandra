@@ -2,7 +2,7 @@ import json
 
 
 class Session:
-    """FIXME: Is this class redundant? It's suspiciously simple."""
+    """Provides easier access to session objects sent along with requests"""
 
     def __init__(self, session_obj):
         self.obj = session_obj
@@ -12,6 +12,7 @@ class Session:
 
     @property
     def is_new(self):
+        """Is this a new session or a previously open one?"""
         return self.obj['new']
 
     @property

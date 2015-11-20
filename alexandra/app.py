@@ -1,8 +1,13 @@
+import logging
+
 from werkzeug.exceptions import abort
 
 from alexandra.session import Session
 from alexandra.util import respond
 from alexandra.wsgi import WsgiApp
+
+
+log = logging.getLogger(__name__)
 
 
 class Application:
@@ -62,6 +67,7 @@ class Application:
         elif req_type == 'SessionEndedRequest':
             return self.session_end_fn()
 
+        log.error('invalid request type: %s', req_type)
         abort(400)
 
     def launch(self, func):

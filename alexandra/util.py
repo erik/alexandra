@@ -1,6 +1,7 @@
 """Utility functionality for Alexandra"""
 
 import base64
+import logging
 import os.path
 import urlparse
 import urllib2
@@ -13,6 +14,7 @@ from OpenSSL import crypto
 # We don't want to check the certificate every single time. Store for
 # as long as they are valid.
 _cache = {}
+log = logging.getLogger(__name__)
 
 
 def respond(text=None, ssml=None, attributes=None, reprompt_text=None,
@@ -85,12 +87,14 @@ def validate_request_timestamp(body):
     time_str = body.get('request', {}).get('timestamp')
 
     if not time_str:
+        log.error('timestamp not present %s', body)
         return False
 
     req_ts = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%SZ")
     diff = (datetime.utcnow() - req_ts).total_seconds()
 
     if abs(diff) > 150:
+        log.error('timestamp drift too high: %d sec', diff)
         return False
 
     return True
@@ -104,6 +108,7 @@ def validate_request_certificate(request):
     # Make sure we have the appropriate headers.
     if 'SignatureCertChainUrl' not in request.headers or \
        'Signature' not in request.headers:
+        log.error('invalid request headers')
         return False
 
     cert_url = request.headers['SignatureCertChainUrl']
@@ -119,6 +124,7 @@ def validate_request_certificate(request):
         crypto.verify(cert, sig, request.data, 'sha1')
         return True
     except:
+        log.error('invalid request signature')
         return False
 
 
@@ -141,15 +147,18 @@ def _get_certificate(cert_url):
     if url.scheme != 'https' or \
        host not in ['s3.amazonaws.com', 's3.amazonaws.com:443'] or \
        not path.startswith('/echo.api/'):
+        log.error('invalid cert location %s', url)
         return
 
     resp = urllib2.urlopen(cert_url)
     if resp.getcode() != 200:
+        log.error('failed to download certificate')
         return
 
     cert = crypto.load_certificate(crypto.FILETYPE_PEM, resp.read())
 
     if cert.has_expired() or cert.get_subject().CN != 'echo-api.amazon.com':
+        log.error('certificate expired or invalid')
         return
 
     _cache[cert_url] = cert

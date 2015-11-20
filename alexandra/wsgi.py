@@ -1,9 +1,13 @@
 import json
+import logging
 
 from werkzeug.wrappers import Request, Response
 from werkzeug.exceptions import HTTPException, abort
 
 import alexandra.util as util
+
+
+log = logging.getLogger(__name__)
 
 
 class WsgiApp:
@@ -26,9 +30,12 @@ class WsgiApp:
                 abort(400)
 
             if self.validate:
-                if not util.validate_request_certificate(request) or \
-                   not util.validate_request_timestamp(body):
-                    abort(400)
+                valid_cert = util.validate_request_certificate(request)
+                valid_ts = util.validate_request_timestamp(body)
+
+                if not valid_cert or not valid_ts:
+                    log.error('failed to validate request')
+                    abort(403)
 
             resp_obj = self.alexa.dispatch_request(body)
             return Response(response=json.dumps(resp_obj, indent=4),

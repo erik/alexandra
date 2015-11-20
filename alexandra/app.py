@@ -12,7 +12,6 @@ class Application:
         self.launch_fn = lambda _: respond
         self.session_end_fn = respond
 
-
     def create_wsgi_app(self, validate_requests=True):
         """Return an object that can be run by any WSGI server (uWSGI,
         etc.) to serve this Alexa application.
@@ -27,8 +26,11 @@ class Application:
             ensure that requests are sent by Amazon. This can be useful
             for manually testing the server.
         """
-
+        import logging
         from werkzeug.serving import run_simple
+
+        # Turn on all alexandra log output
+        logging.basicConfig(level=logging.DEBUG)
 
         app = self.create_wsgi_app(validate_requests)
         run_simple(host, port, app, use_reloader=True, use_debugger=True)

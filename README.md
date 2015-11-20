@@ -7,18 +7,8 @@ skills.
 Alexandra can be used as part of an AWS lambda function or a self-hosted
 server. There's a builtin WSGI app if you're in to that kind of thing.
 
-
-installing
-----------
-
-Alexandra uses `pyOpenSSL`, which requires the `libffi` library to
-compile. Make sure that's installed first.
-
-`pip install alexandra`
-
-
-how to use
-----------
+Check out [the api documentation](http://alexandra.rtfd.org/) for more details
+on what alexandra can do.
 
 ```python
 
@@ -50,6 +40,14 @@ def get_name_intent(slots, session):
 if __name__ == '__main__':
     app.run_debug('0.0.0.0', 8080)
 ```
+
+installing
+----------
+
+Alexandra uses `pyOpenSSL`, which requires the `libffi` library to
+compile. Make sure that's installed first.
+
+`pip install alexandra`
 
 
 running with uwsgi

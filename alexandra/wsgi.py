@@ -11,9 +11,12 @@ log = logging.getLogger(__name__)
 
 
 class WsgiApp:
-    """This class is compatible with Werkzeug's WSGI implementation and
+    """This class is wraps :py:obj:`alexandra.app.Application` object and
     handles all the gory details of parsing Alexa requests and validating that
     they were actually sent by Amazon.
+
+    This class implements the WSGI interface, so an instance of can be passed
+    to standard WSGI servers (uWSGI, gunicorn, ...)
     """
 
     def __init__(self, alexa, validate_requests=True):
@@ -26,12 +29,17 @@ class WsgiApp:
         self.alexa = alexa
         self.validate = validate_requests
 
+    # The Request.application decorator handles some boring parts of making
+    # this work with WSGI
     @Request.application
     def __call__(self, request):
         return self.wsgi_app(request)
 
     def wsgi_app(self, request):
-        """Validates and routes WSGI requests."""
+        """Incoming request handler.
+
+        :param request: Werkzeug request object
+        """
 
         try:
             if request.method != 'POST':

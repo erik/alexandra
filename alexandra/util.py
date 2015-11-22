@@ -60,8 +60,8 @@ def respond(text=None, ssml=None, attributes=None, reprompt_text=None,
 
 def reprompt(text=None, ssml=None, attributes=None):
     """Convenience method to save a little bit of typing for the common case of
-    reprompting the user. Simply calls `respond` with the given arguments and
-    holds the session open.
+    reprompting the user. Simply calls :py:func:`alexandra.util.respond` with
+    the given arguments and holds the session open.
 
     One of either the `text` or `ssml` should be provided if any
     speech output is desired.

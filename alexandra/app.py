@@ -42,7 +42,13 @@ class Application:
         run_simple(host, port, app, use_reloader=debug, use_debugger=debug)
 
     def dispatch_request(self, body):
-        """Called by WsgiApp"""
+        """Given a parsed JSON request object, call the correct Intent, Launch,
+        or SessionEnded function.
+
+        This function is called after request parsing and validaion.
+
+        :param body: JSON object loaded from incoming request's POST data.
+        """
 
         req_type = body['request']['type']
         session = Session(body.get('session', {}))

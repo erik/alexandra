@@ -47,17 +47,38 @@ installing
 Alexandra uses `pyOpenSSL`, which requires the `libffi` library to
 compile. Make sure that's installed first.
 
+If you're on OS X, check out
+[the special instructions](https://cryptography.io/en/latest/installation/#building-cryptography-on-os-x)
+for installing the OpenSSL library.
+
+
+And then:
+
 `pip install alexandra`
 
 
 running with uwsgi
 ------------------
 
-The `alexandra.Application` class has a `run_debug` method, which is useful
-enough for testing purposes, but for real deployments, you'll probably want to
-use something a little more robust, such as uWSGI.
+The `alexandra.Application` class has a `run` method, which is useful enough
+for testing purposes and simple projects, but for real deployments, you'll
+probably want to use something a little more robust, such as uWSGI.
 
-TODO: write me
+Alexandra works with uwsgi in almost exactly the same way Flask does.
+
+```python
+# skill_module.py
+
+app = alexandra.Application()
+wsgi_app = app.create_wsgi_app()
+
+@app.intent('FooBar')
+def foobar():
+    ...
+```
+
+The above can be run with uwsgi as
+`uwsgi -w skill_module:wsgi_app --http 0.0.0.0:5678`
 
 setting up a web server
 -----------------------

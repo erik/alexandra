@@ -1,5 +1,6 @@
 import logging
 
+from werkzeug.serving import run_simple
 from werkzeug.exceptions import abort
 
 from alexandra.session import Session
@@ -24,22 +25,21 @@ class Application:
 
         return WsgiApp(self, validate_requests)
 
-    def run_debug(self, host, port, validate_requests=True):
-        """Utility method to quickly get a test server up and running.
+    def run(self, host, port, debug=True, validate_requests=True):
+        """Utility method to quickly get a server up and running.
 
-        This turns on debug logging and enables Werkzeug's automatic reloader.
-
+        :param debug: turns on Werkzeug debugger, code reloading, and full
+            logging.
         :param validate_requests: whether or not to ensure that requests are
             sent by Amazon. This can be usefulfor manually testing the server.
         """
-        import logging
-        from werkzeug.serving import run_simple
 
-        # Turn on all alexandra log output
-        logging.basicConfig(level=logging.DEBUG)
+        if debug:
+            # Turn on all alexandra log output
+            logging.basicConfig(level=logging.DEBUG)
 
         app = self.create_wsgi_app(validate_requests)
-        run_simple(host, port, app, use_reloader=True, use_debugger=True)
+        run_simple(host, port, app, use_reloader=debug, use_debugger=debug)
 
     def dispatch_request(self, body):
         """Called by WsgiApp"""

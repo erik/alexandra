@@ -38,7 +38,7 @@ def get_name_intent(slots, session):
     return alexandra.reprompt("We haven't met yet! What's your name?")
 
 if __name__ == '__main__':
-    app.run_debug('0.0.0.0', 8080)
+    app.run('0.0.0.0', 8080, debug=True)
 ```
 
 installing

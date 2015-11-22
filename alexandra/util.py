@@ -79,15 +79,19 @@ def reprompt(text=None, ssml=None, attributes=None):
     )
 
 
-def validate_request_timestamp(body):
+def validate_request_timestamp(req_body):
     """Ensure the request's timestamp doesn't fall outside of the
     app's specified tolerance.
+
+    Returns True if this request is valid, False otherwise.
+
+    :param req_body: JSON object parsed out of the raw POST data of a request.
     """
 
-    time_str = body.get('request', {}).get('timestamp')
+    time_str = req_body.get('request', {}).get('timestamp')
 
     if not time_str:
-        log.error('timestamp not present %s', body)
+        log.error('timestamp not present %s', req_body)
         return False
 
     req_ts = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%SZ")
@@ -100,19 +104,25 @@ def validate_request_timestamp(body):
     return True
 
 
-def validate_request_certificate(request):
+def validate_request_certificate(headers, data):
     """Ensure that the certificate and signature specified in the
     request headers are truely from Amazon and correctly verify.
+
+    Returns True if certificate verification succeeds, False otherwise.
+
+    :param headers: Dictionary (or sufficiently dictionary-like) map of request
+        headers.
+    :param data: Raw POST data attached to this request.
     """
 
     # Make sure we have the appropriate headers.
-    if 'SignatureCertChainUrl' not in request.headers or \
-       'Signature' not in request.headers:
+    if 'SignatureCertChainUrl' not in headers or \
+       'Signature' not in headers:
         log.error('invalid request headers')
         return False
 
-    cert_url = request.headers['SignatureCertChainUrl']
-    sig = base64.b64decode(request.headers['Signature'])
+    cert_url = headers['SignatureCertChainUrl']
+    sig = base64.b64decode(headers['Signature'])
 
     cert = _get_certificate(cert_url)
 
@@ -121,7 +131,7 @@ def validate_request_certificate(request):
 
     try:
         # ... wtf kind of API decision is this
-        crypto.verify(cert, sig, request.data, 'sha1')
+        crypto.verify(cert, sig, data, 'sha1')
         return True
     except:
         log.error('invalid request signature')

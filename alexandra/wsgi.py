@@ -43,7 +43,9 @@ class WsgiApp:
                 abort(400)
 
             if self.validate:
-                valid_cert = util.validate_request_certificate(request)
+                valid_cert = util.validate_request_certificate(
+                    request.headers, request.data)
+
                 valid_ts = util.validate_request_timestamp(body)
 
                 if not valid_cert or not valid_ts:
@@ -56,4 +58,5 @@ class WsgiApp:
                             mimetype='application/json')
 
         except HTTPException, exc:
+            log.exception('Failed to handle request')
             return exc

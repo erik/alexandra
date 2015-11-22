@@ -27,9 +27,10 @@ class Application:
     def run_debug(self, host, port, validate_requests=True):
         """Utility method to quickly get a test server up and running.
 
-        :param validate_requests: if is False, no checking will be done to
-            ensure that requests are sent by Amazon. This can be useful
-            for manually testing the server.
+        This turns on debug logging and enables Werkzeug's automatic reloader.
+
+        :param validate_requests: whether or not to ensure that requests are
+            sent by Amazon. This can be usefulfor manually testing the server.
         """
         import logging
         from werkzeug.serving import run_simple

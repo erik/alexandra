@@ -54,7 +54,7 @@ class Application:
             intent_fn = self.intent_map.get(intent, self.unknown_intent_fn)
 
             slots = {
-                slot['name']: slot['value']
+                slot['name']: slot.get('value')
                 for _, slot in
                 body['request']['intent'].get('slots', {}).iteritems()
             }

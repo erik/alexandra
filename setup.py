@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='alexandra',
-    version='0.1.0',
+    version='0.1.1',
     description='Toolkit for writing Amazon Alexa skills as web services',
     author='Erik Price',
     url='https://github.com/erik/alexandra',

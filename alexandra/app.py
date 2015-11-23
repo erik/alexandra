@@ -45,12 +45,13 @@ class Application:
         """Given a parsed JSON request object, call the correct Intent, Launch,
         or SessionEnded function.
 
-        This function is called after request parsing and validaion.
+        This function is called after request parsing and validaion and will
+        raise a `ValueError` if an unknown request type comes in.
 
         :param body: JSON object loaded from incoming request's POST data.
         """
 
-        req_type = body['request']['type']
+        req_type = body.get('request', {}).get('type')
         session_obj = body.get('session')
 
         session = Session(session_obj) if session_obj else None
@@ -77,7 +78,7 @@ class Application:
             return self.session_end_fn()
 
         log.error('invalid request type: %s', req_type)
-        abort(400)
+        raise ValueError('bad request: %s', body)
 
     def launch(self, func):
         """Decorator to register a function to be called whenever the
@@ -100,7 +101,7 @@ class Application:
         a :py:class:`alexandra.session.Session` instance.
 
         If no session was provided in the request, the session object will be
-        `None`.
+        `None`. ::
 
             @alexa_app.intent('FooBarBaz')
             def foo_bar_baz_intent(slots, session):

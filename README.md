@@ -102,13 +102,3 @@ location /some_random_endpoint {
     proxy_pass http://localhost:6789
 }
 ```
-
-
-ugh it doesn't work you suck i keep getting invalid requests
----------------
-
-Is your clock set correctly? You're going to need NTP running so your clock
-doesn't drift too away from from reality.
-
-Especially relevant if the server is running on a Raspberry Pi or some
-similarly underpowered box.

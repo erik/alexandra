@@ -93,10 +93,9 @@ class Application:
     def intent(self, intent_name):
         """Decorator to register a handler for the given intent.
 
-        The decorated function can either:
-
-        - have two arguments: (slot_dictionary, session_obj).
-        - have zero arguments. ::
+        The decorated function can either take 0 or 2 arguments. If two are
+        specified, it will be provided a dictionary of `{slot_name: value}` and
+        a :py:class:`alexandra.session.Session` instance.
 
             @alexa_app.intent('FooBarBaz')
             def foo_bar_baz_intent(slots, session):

@@ -51,7 +51,9 @@ class Application:
         """
 
         req_type = body['request']['type']
-        session = Session(body.get('session', {}))
+        session_obj = body.get('session')
+
+        session = Session(session_obj) if session_obj else None
 
         if req_type == 'LaunchRequest':
             return self.launch_fn(session)
@@ -96,6 +98,9 @@ class Application:
         The decorated function can either take 0 or 2 arguments. If two are
         specified, it will be provided a dictionary of `{slot_name: value}` and
         a :py:class:`alexandra.session.Session` instance.
+
+        If no session was provided in the request, the session object will be
+        `None`.
 
             @alexa_app.intent('FooBarBaz')
             def foo_bar_baz_intent(slots, session):

@@ -57,6 +57,27 @@ And then:
 `pip install alexandra`
 
 
+using alexandra with aws lambda
+-------------------------------
+
+Getting an alexandra app running on lambda is much easier than running your own
+server, and is probably the right choice unless you need to access the local network 
+or have some other complication that prevents you from using the service.
+
+Here's an example:
+
+```python
+app = alexandra.Application()
+
+@app.intent('FooBar')
+def foo_bar():
+    ...
+
+# Entry point to our lambda function.
+def lambda_handler(event, context):
+    return alexa.dispatch_request(event)
+```
+
 running with uwsgi
 ------------------
 

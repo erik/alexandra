@@ -6,7 +6,6 @@ from alexandra.session import Session
 from alexandra.util import respond
 from alexandra.wsgi import WsgiApp
 
-
 log = logging.getLogger(__name__)
 
 

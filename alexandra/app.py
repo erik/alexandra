@@ -1,4 +1,5 @@
 import logging
+import inspect
 
 from werkzeug.serving import run_simple
 
@@ -112,7 +113,8 @@ class Application:
 
         # nested decorator so we can have params.
         def _decorator(func):
-            if func.func_code.co_argcount not in [0, 2]:
+            (_, code), = inspect.getmembers(func, inspect.iscode)
+            if code.co_argcount not in [0, 2]:
                 raise ValueError("expected 0 or 2 argument function")
 
             self.intent_map[intent_name] = func

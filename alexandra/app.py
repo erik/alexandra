@@ -1,7 +1,6 @@
 import logging
 
 from werkzeug.serving import run_simple
-from werkzeug.exceptions import abort
 
 from alexandra.session import Session
 from alexandra.util import respond

@@ -1,3 +1,4 @@
+# flake8: noqa
 """
 Python support for Alexa applications.
 

@@ -3,8 +3,8 @@
 import base64
 import logging
 import os.path
-import urlparse
-import urllib2
+from urllib.parse import urlparse
+from urllib.request import urlopen
 
 from datetime import datetime
 
@@ -152,7 +152,7 @@ def _get_certificate(cert_url):
         else:
             return cert
 
-    url = urlparse.urlparse(cert_url)
+    url = urlparse(cert_url)
     host = url.netloc.lower()
     path = os.path.normpath(url.path)
 
@@ -163,7 +163,7 @@ def _get_certificate(cert_url):
         log.error('invalid cert location %s', url)
         return
 
-    resp = urllib2.urlopen(cert_url)
+    resp = urlopen(cert_url)
     if resp.getcode() != 200:
         log.error('failed to download certificate')
         return

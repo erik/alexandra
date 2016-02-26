@@ -65,6 +65,6 @@ class WsgiApp:
                             status=200,
                             mimetype='application/json')
 
-        except HTTPException, exc:
+        except HTTPException as exc:
             log.exception('Failed to handle request')
             return exc

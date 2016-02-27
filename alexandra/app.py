@@ -74,7 +74,15 @@ class Application:
                 for _, slot in slot_list
             }
 
-            if intent_fn.func_code.co_argcount == 2:
+            code_list = inspect.getmembers(intent_fn, inspect.iscode)
+
+            # Python 2.7 compatibility.
+            if len(code_list) == 1:
+                (_, code) = code_list[0]
+            else:
+                (_, code) = code_list[1]
+
+            if code.co_argcount == 2:
                 return intent_fn(slots, session)
 
             return intent_fn()

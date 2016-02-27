@@ -61,11 +61,17 @@ class Application:
         elif req_type == 'IntentRequest':
             intent = body['request']['intent']['name']
             intent_fn = self.intent_map.get(intent, self.unknown_intent_fn)
+            slots = body['request']['intent'].get('slots', {})
+
+            # Python 2.7 compatibility.
+            try:
+                slot_list = slots.iteritems()
+            except AttributeError:
+                slot_list = slots.items()
 
             slots = {
                 slot['name']: slot.get('value')
-                for _, slot in
-                body['request']['intent'].get('slots', {}).iteritems()
+                for _, slot in slot_list
             }
 
             if intent_fn.func_code.co_argcount == 2:

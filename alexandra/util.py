@@ -3,8 +3,13 @@
 import base64
 import logging
 import os.path
-from urllib.parse import urlparse
-from urllib.request import urlopen
+
+try:
+    from urlparse import urlparse
+    from urllib2 import urlopen
+except:
+    from urllib.parse import urlparse
+    from urllib.request import urlopen
 
 from datetime import datetime
 

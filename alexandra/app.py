@@ -113,7 +113,13 @@ class Application:
 
         # nested decorator so we can have params.
         def _decorator(func):
-            (_, code), = inspect.getmembers(func, inspect.iscode)
+            code_list = inspect.getmembers(func, inspect.iscode)
+
+            # Python 2.7 compatibility.
+            if len(code_list) == 1:
+                (_, code) = code_list[0]
+            else:
+                (_, code) = code_list[1]
             if code.co_argcount not in [0, 2]:
                 raise ValueError("expected 0 or 2 argument function")
 

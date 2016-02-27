@@ -8,6 +8,7 @@ setup(
     url='https://github.com/erik/alexandra',
     packages=['alexandra'],
     license='ISC',
+    test_requires=['tox'],
     install_requires=[
         'Werkzeug==0.11.4',
         'pyOpenssl==0.15.1'

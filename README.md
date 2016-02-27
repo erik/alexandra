@@ -1,8 +1,10 @@
 alexandra
 =========
 
-Minimal library to remove the tedious boilerplate-y parts of writing Alexa
-skills.
+[![Build Status](https://travis-ci.org/erik/alexandra.svg?branch=master)](https://travis-ci.org/erik/alexandra)
+
+Minimal Python library to remove the tedious boilerplate-y parts of writing
+Alexa skills. Alexandra is tested against Python 2.7 and 3.5.1.
 
 Alexandra can be used as part of an AWS lambda function or a self-hosted
 server. There's a builtin WSGI app if you're in to that kind of thing.
@@ -61,7 +63,7 @@ using alexandra with aws lambda
 -------------------------------
 
 Getting an alexandra app running on lambda is much easier than running your own
-server, and is probably the right choice unless you need to access the local network 
+server, and is probably the right choice unless you need to access the local network
 or have some other complication that prevents you from using the service.
 
 Here's an example:

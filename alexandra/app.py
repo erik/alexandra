@@ -1,12 +1,11 @@
 import logging
+import inspect
 
 from werkzeug.serving import run_simple
-from werkzeug.exceptions import abort
 
 from alexandra.session import Session
 from alexandra.util import respond
 from alexandra.wsgi import WsgiApp
-
 
 log = logging.getLogger(__name__)
 
@@ -66,10 +65,18 @@ class Application:
             slots = {
                 slot['name']: slot.get('value')
                 for _, slot in
-                body['request']['intent'].get('slots', {}).iteritems()
+                body['request']['intent'].get('slots', {}).items()
             }
 
-            if intent_fn.func_code.co_argcount == 2:
+            code_list = inspect.getmembers(intent_fn, inspect.iscode)
+
+            # Python 2.7 compatibility.
+            if len(code_list) == 1:
+                (_, code) = code_list[0]
+            else:
+                (_, code) = code_list[1]
+
+            if code.co_argcount == 2:
                 return intent_fn(slots, session)
 
             return intent_fn()
@@ -114,7 +121,14 @@ class Application:
 
         # nested decorator so we can have params.
         def _decorator(func):
-            if func.func_code.co_argcount not in [0, 2]:
+            code_list = inspect.getmembers(func, inspect.iscode)
+
+            # Python 2.7 compatibility.
+            if len(code_list) == 1:
+                (_, code) = code_list[0]
+            else:
+                (_, code) = code_list[1]
+            if code.co_argcount not in [0, 2]:
                 raise ValueError("expected 0 or 2 argument function")
 
             self.intent_map[intent_name] = func

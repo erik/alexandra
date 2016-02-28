@@ -46,7 +46,12 @@ class WsgiApp:
                 abort(400)
 
             try:
-                body = json.loads(request.data)
+                # Python 2.7 compatibility
+                data = request.data
+                if isinstance(data, str):
+                    body = json.loads(data)
+                else:
+                    body = json.loads(data.decode('utf-8'))
             except ValueError:
                 abort(400)
 
@@ -65,6 +70,6 @@ class WsgiApp:
                             status=200,
                             mimetype='application/json')
 
-        except HTTPException, exc:
+        except HTTPException as exc:
             log.exception('Failed to handle request')
             return exc

@@ -14,7 +14,7 @@ class Application:
     def __init__(self):
         self.intent_map = {}
         self.unknown_intent_fn = lambda x, y: respond(text='unknown intent')
-        self.launch_fn = lambda _: respond
+        self.launch_fn = lambda _: respond()
         self.session_end_fn = respond
 
     def create_wsgi_app(self, validate_requests=True):

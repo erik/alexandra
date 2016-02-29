@@ -54,11 +54,13 @@ class TestRespond:
             'sessionAttributes': {'a': 'b'}
         }
 
+
 class TestReprompt:
     '''alexandra.util.reprompt'''
 
     def test_reprompt_sanity(self):
-        pass
+        assert util.reprompt(text='foo') == util.respond(reprompt_text='foo', end_session=False)
+        assert util.reprompt(ssml='foo') == util.respond(reprompt_ssml='foo', end_session=False)
 
 
 class TestValidateTimestamp:

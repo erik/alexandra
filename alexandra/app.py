@@ -1,5 +1,4 @@
 import logging
-import inspect
 
 from werkzeug.serving import run_simple
 
@@ -68,7 +67,7 @@ class Application:
                 body['request']['intent'].get('slots', {}).items()
             }
 
-            arity = len(inspect.getargspec(intent_fn).args)
+            arity = intent_fn.__code__.co_argcount
 
             if arity == 2:
                 return intent_fn(slots, session)
@@ -115,7 +114,7 @@ class Application:
 
         # nested decorator so we can have params.
         def _decorator(func):
-            arity = len(inspect.getargspec(func).args)
+            arity = func.__code__.co_argcount
 
             if arity not in [0, 2]:
                 raise ValueError("expected 0 or 2 argument function")

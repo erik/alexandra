@@ -5,17 +5,54 @@ class TestRespond:
     '''alexandra.util.respond'''
 
     def test_sanity(self):
-        pass
+        resp = util.respond()
+
+        assert resp == {
+            'version': '1.0',
+            'shouldEndSession': True,
+            'response': {
+                'outputSpeech': {'type': 'PlainText', 'text': ''}
+            },
+            'sessionAttributes': {}
+        }
 
     def test_output_format(self):
-        pass
+        resp = util.respond(text='foobar')
+        assert resp['response'] == {
+            'outputSpeech': {'type': 'PlainText', 'text': 'foobar'}
+        }
+
+        resp = util.respond(ssml='foobar')
+        assert resp['response'] == {
+            'outputSpeech': {'type': 'SSML', 'ssml': 'foobar'}
+        }
 
     def test_reprompt(self):
-        pass
+        resp = util.respond(reprompt_text='foobar')
+        assert resp['response']['reprompt'] == {
+            'outputSpeech': {'type': 'PlainText', 'text': 'foobar'}
+        }
 
-    def test_reprompt_ssml(self):
-        pass
+        resp = util.respond(reprompt_ssml='foobar')
+        assert resp['response']['reprompt'] == {
+            'outputSpeech': {'type': 'SSML', 'ssml': 'foobar'}
+        }
 
+    def test_argument_mashup(self):
+        resp = util.respond(text='foo', reprompt_ssml='bar',
+                            attributes={'a': 'b'}, end_session=False)
+
+        assert resp == {
+            'version': '1.0',
+            'shouldEndSession': False,
+            'response': {
+                'outputSpeech': {'type': 'PlainText', 'text': 'foo'},
+                'reprompt': {
+                    'outputSpeech': {'type': 'SSML', 'ssml': 'bar'}
+                }
+            },
+            'sessionAttributes': {'a': 'b'}
+        }
 
 class TestReprompt:
     '''alexandra.util.reprompt'''

@@ -65,9 +65,11 @@ class TestReprompt:
 
 class TestValidateTimestamp:
     '''alexandra.util.validate_request_timestamp'''
+    # TODO: write me
     pass
 
 
 class TestValidateCertificate:
     '''alexandra.util.validate_request_certificate'''
+    # TODO: write me
     pass

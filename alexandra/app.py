@@ -68,15 +68,9 @@ class Application:
                 body['request']['intent'].get('slots', {}).items()
             }
 
-            code_list = inspect.getmembers(intent_fn, inspect.iscode)
+            arity = len(inspect.getargspec(intent_fn).args)
 
-            # Python 2.7 compatibility.
-            if len(code_list) == 1:
-                (_, code) = code_list[0]
-            else:
-                (_, code) = code_list[1]
-
-            if code.co_argcount == 2:
+            if arity == 2:
                 return intent_fn(slots, session)
 
             return intent_fn()
@@ -121,14 +115,9 @@ class Application:
 
         # nested decorator so we can have params.
         def _decorator(func):
-            code_list = inspect.getmembers(func, inspect.iscode)
+            arity = len(inspect.getargspec(func).args)
 
-            # Python 2.7 compatibility.
-            if len(code_list) == 1:
-                (_, code) = code_list[0]
-            else:
-                (_, code) = code_list[1]
-            if code.co_argcount not in [0, 2]:
+            if arity not in [0, 2]:
                 raise ValueError("expected 0 or 2 argument function")
 
             self.intent_map[intent_name] = func

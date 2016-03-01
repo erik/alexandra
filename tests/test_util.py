@@ -1,3 +1,7 @@
+from cStringIO import StringIO
+import datetime as dt
+import logging
+
 from alexandra import util
 
 
@@ -65,8 +69,50 @@ class TestReprompt:
 
 class TestValidateTimestamp:
     '''alexandra.util.validate_request_timestamp'''
-    # TODO: write me
-    pass
+
+    def setup_class(self):
+        self.log = StringIO()
+        self.logger = logging.StreamHandler(stream=self.log)
+
+        logging.getLogger('alexandra').addHandler(self.logger)
+
+    def teardown_class(self):
+        logging.getLogger('alexandra').removeHandler(self.logger)
+
+    def last_log(self):
+        value = self.log.getvalue()
+        self.log.truncate(0)
+        self.log.seek(0)
+
+        return value
+
+    def test_missing_timestamp(self):
+        assert util.validate_request_timestamp({}) is False
+        assert self.last_log() == 'timestamp not present {}\n'
+
+    def test_expired_timestamp(self):
+        future = dt.datetime.utcnow() + dt.timedelta(hours=3)
+        past = dt.datetime.utcnow() - dt.timedelta(hours=3)
+
+        assert util.validate_request_timestamp({
+            'request': {'timestamp': future.strftime('%Y-%m-%dT%H:%M:%SZ')}
+        }) is False
+
+        assert 'timestamp difference too high' in self.last_log()
+
+        assert util.validate_request_timestamp({
+            'request': {'timestamp': past.strftime('%Y-%m-%dT%H:%M:%SZ')}
+        }) is False
+
+        assert 'timestamp difference too high' in self.last_log()
+
+    def test_good_timestamp(self):
+        now = dt.datetime.utcnow()
+
+        assert util.validate_request_timestamp({
+            'request': {'timestamp': now.strftime('%Y-%m-%dT%H:%M:%SZ')}
+        }) is True
+
 
 
 class TestValidateCertificate:

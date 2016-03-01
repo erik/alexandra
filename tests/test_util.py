@@ -1,3 +1,11 @@
+try:
+    from cStringIO import StringIO
+except:
+    from io import StringIO
+
+import datetime as dt
+import logging
+
 from alexandra import util
 
 
@@ -65,11 +73,94 @@ class TestReprompt:
 
 class TestValidateTimestamp:
     '''alexandra.util.validate_request_timestamp'''
-    # TODO: write me
-    pass
+
+    def setup_class(self):
+        self.log = StringIO()
+        self.logger = logging.StreamHandler(stream=self.log)
+
+        logging.getLogger('alexandra').addHandler(self.logger)
+
+    def teardown_class(self):
+        logging.getLogger('alexandra').removeHandler(self.logger)
+
+    def last_log(self):
+        value = self.log.getvalue()
+        self.log.truncate(0)
+        self.log.seek(0)
+
+        return value
+
+    def test_missing_timestamp(self):
+        assert util.validate_request_timestamp({}) is False
+        assert self.last_log() == 'timestamp not present {}\n'
+
+    def test_expired_timestamp(self):
+        future = dt.datetime.utcnow() + dt.timedelta(hours=3)
+        past = dt.datetime.utcnow() - dt.timedelta(hours=3)
+
+        assert util.validate_request_timestamp({
+            'request': {'timestamp': future.strftime('%Y-%m-%dT%H:%M:%SZ')}
+        }) is False
+
+        assert 'timestamp difference too high' in self.last_log()
+
+        assert util.validate_request_timestamp({
+            'request': {'timestamp': past.strftime('%Y-%m-%dT%H:%M:%SZ')}
+        }) is False
+
+        assert 'timestamp difference too high' in self.last_log()
+
+    def test_good_timestamp(self):
+        now = dt.datetime.utcnow()
+
+        assert util.validate_request_timestamp({
+            'request': {'timestamp': now.strftime('%Y-%m-%dT%H:%M:%SZ')}
+        }) is True
 
 
 class TestValidateCertificate:
     '''alexandra.util.validate_request_certificate'''
-    # TODO: write me
-    pass
+
+    def setup_class(self):
+        self.log = StringIO()
+        self.logger = logging.StreamHandler(stream=self.log)
+
+        logging.getLogger('alexandra').addHandler(self.logger)
+
+    def teardown_class(self):
+        self.log.close()
+        logging.getLogger('alexandra').removeHandler(self.logger)
+
+    def last_log(self):
+        value = self.log.getvalue()
+        self.log.truncate(0)
+        self.log.seek(0)
+
+        return value
+
+    def test_bogus_urls(self):
+        '''explicitly given by amazon docs as failure cases'''
+
+        cases = [
+            'http://s3.amazonaws.com/echo.api/echo-api-cert.pem',
+            'https://notamazon.com/echo.api/echo-api-cert.pem',
+            'https://s3.amazonaws.com/EcHo.aPi/echo-api-cert.pem',
+            'https://s3.amazonaws.com/invalid.path/echo-api-cert.pem',
+            'https://s3.amazonaws.com:563/echo.api/echo-api-cert.pem',
+        ]
+
+        for case in cases:
+            assert util._get_certificate(case) is None
+            assert self.last_log() == 'invalid cert location %s\n' % case
+
+    def test_good_url_expired_cert(self):
+        '''correctly formatted url, but certificate expired'''
+
+        cases = [
+            'https://s3.amazonaws.com/echo.api/echo-api-cert.pem',
+            'https://s3.amazonaws.com:443/echo.api/echo-api-cert.pem',
+        ]
+
+        for case in cases:
+            assert util._get_certificate(case) is None
+            assert self.last_log() == 'certificate expired or invalid\n'

@@ -153,5 +153,14 @@ class TestValidateCertificate:
             assert util._get_certificate(case) is None
             assert self.last_log() == 'invalid cert location %s\n' % case
 
-    def test_expired_cert(self):
-        pass
+    def test_good_url_expired_cert(self):
+        '''correctly formatted url, but certificate expired'''
+
+        cases = [
+            'https://s3.amazonaws.com/echo.api/echo-api-cert.pem',
+            'https://s3.amazonaws.com:443/echo.api/echo-api-cert.pem',
+        ]
+
+        for case in cases:
+            assert util._get_certificate(case) is None
+            assert self.last_log() == 'certificate expired or invalid\n'

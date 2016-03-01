@@ -165,7 +165,7 @@ def _get_certificate(cert_url):
     if url.scheme != 'https' or \
        host not in ['s3.amazonaws.com', 's3.amazonaws.com:443'] or \
        not path.startswith('/echo.api/'):
-        log.error('invalid cert location %s', url)
+        log.error('invalid cert location %s', cert_url)
         return
 
     resp = urlopen(cert_url)

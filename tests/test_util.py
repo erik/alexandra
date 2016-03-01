@@ -118,8 +118,40 @@ class TestValidateTimestamp:
         }) is True
 
 
-
 class TestValidateCertificate:
     '''alexandra.util.validate_request_certificate'''
-    # TODO: write me
-    pass
+
+    def setup_class(self):
+        self.log = StringIO()
+        self.logger = logging.StreamHandler(stream=self.log)
+
+        logging.getLogger('alexandra').addHandler(self.logger)
+
+    def teardown_class(self):
+        self.log.close()
+        logging.getLogger('alexandra').removeHandler(self.logger)
+
+    def last_log(self):
+        value = self.log.getvalue()
+        self.log.truncate(0)
+        self.log.seek(0)
+
+        return value
+
+    def test_bogus_urls(self):
+        '''explicitly given by amazon docs as failure cases'''
+
+        cases = [
+            'http://s3.amazonaws.com/echo.api/echo-api-cert.pem',
+            'https://notamazon.com/echo.api/echo-api-cert.pem',
+            'https://s3.amazonaws.com/EcHo.aPi/echo-api-cert.pem',
+            'https://s3.amazonaws.com/invalid.path/echo-api-cert.pem',
+            'https://s3.amazonaws.com:563/echo.api/echo-api-cert.pem',
+        ]
+
+        for case in cases:
+            assert util._get_certificate(case) is None
+            assert self.last_log() == 'invalid cert location %s\n' % case
+
+    def test_expired_cert(self):
+        pass

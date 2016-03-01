@@ -1,4 +1,8 @@
-from cStringIO import StringIO
+try:
+    from cStringIO import StringIO
+except:
+    from io import StringIO
+
 import datetime as dt
 import logging
 

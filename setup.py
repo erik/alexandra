@@ -17,7 +17,6 @@ setup(
         'Topic :: Software Development :: Libraries :: Application Frameworks',
     ],
     packages=['alexandra'],
-    scripts=['bin/alexandra'],
     license='ISC',
     test_requires=['tox'],
     install_requires=[

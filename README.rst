@@ -51,7 +51,7 @@ compile. Make sure that's installed first.
 
 If you're on OS X, check out `the special
 instructions <https://cryptography.io/en/latest/installation/#building-cryptography-on-os-x>`__
-for installing the OpenSSL library.
+for installing the OpenSSL library if you get errors during installation.
 
 And then:
 
@@ -110,10 +110,10 @@ Amazon requires a real SSL certificate for skills to be rolled out to
 other users, but fortunately for testing and personal projects
 self-signed certificates are acceptable.
 
-You can use `this hacky
-script <https://gist.github.com/erik/119dd32efc269d6dd5d7>`__ to
-generate a self signed certificate and Nginx config which should work
-well-enough for testing purposes.
+To make it a bit easier to generate a self signed SSL certificate and
+nginx configuration, here's a Python 2.7/3.5.1 compatible
+[standalone script](https://gist.github.com/erik/119dd32efc269d6dd5d7) to
+generate basic config for a standard unix setup.
 
 After running the script, simply add a ``location`` block to the nginx
 config for any new Alexa skills being hosted on the same box.
@@ -124,7 +124,7 @@ would add:
 ::
 
     location /some_random_endpoint {
-        proxy_pass http://localhost:6789
+        proxy_pass http://localhost:6789;
     }
 
 .. |Build Status| image:: https://travis-ci.org/erik/alexandra.svg?branch=master

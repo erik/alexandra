@@ -112,7 +112,7 @@ self-signed certificates are acceptable.
 
 To make it a bit easier to generate a self signed SSL certificate and
 nginx configuration, here's a Python 2.7/3.5.1 compatible
-[standalone script](https://gist.github.com/erik/119dd32efc269d6dd5d7) to
+`standalone script <https://gist.github.com/erik/119dd32efc269d6dd5d7>`_ to
 generate basic config for a standard unix setup.
 
 After running the script, simply add a ``location`` block to the nginx

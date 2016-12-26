@@ -17,9 +17,9 @@ class TestRespond:
 
         assert resp == {
             'version': '1.0',
-            'shouldEndSession': True,
             'response': {
-                'outputSpeech': {'type': 'PlainText', 'text': ''}
+                'outputSpeech': {'type': 'PlainText', 'text': ''},
+                'shouldEndSession': True
             },
             'sessionAttributes': {}
         }
@@ -27,12 +27,14 @@ class TestRespond:
     def test_output_format(self):
         resp = util.respond(text='foobar')
         assert resp['response'] == {
-            'outputSpeech': {'type': 'PlainText', 'text': 'foobar'}
+            'outputSpeech': {'type': 'PlainText', 'text': 'foobar'},
+            'shouldEndSession': True
         }
 
         resp = util.respond(ssml='foobar')
         assert resp['response'] == {
-            'outputSpeech': {'type': 'SSML', 'ssml': 'foobar'}
+            'outputSpeech': {'type': 'SSML', 'ssml': 'foobar'},
+            'shouldEndSession': True
         }
 
     def test_reprompt(self):
@@ -52,9 +54,9 @@ class TestRespond:
 
         assert resp == {
             'version': '1.0',
-            'shouldEndSession': False,
             'response': {
                 'outputSpeech': {'type': 'PlainText', 'text': 'foo'},
+                'shouldEndSession': False,
                 'reprompt': {
                     'outputSpeech': {'type': 'SSML', 'ssml': 'bar'}
                 }

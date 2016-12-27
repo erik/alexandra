@@ -39,9 +39,9 @@ def respond(text=None, ssml=None, attributes=None, reprompt_text=None,
 
     obj = {
         'version': '1.0',
-        'shouldEndSession': end_session,
         'response': {
-            'outputSpeech': {'type': 'PlainText', 'text': ''}
+            'outputSpeech': {'type': 'PlainText', 'text': ''},
+            'shouldEndSession': end_session
         },
         'sessionAttributes': attributes or {}
     }

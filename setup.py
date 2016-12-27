@@ -21,6 +21,6 @@ setup(
     test_requires=['tox'],
     install_requires=[
         'Werkzeug==0.11.4',
-        'pyOpenssl==16.1.0'
+        'pyOpenSSL==16.1.0'
     ]
 )

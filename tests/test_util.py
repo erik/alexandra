@@ -69,8 +69,8 @@ class TestReprompt:
     '''alexandra.util.reprompt'''
 
     def test_reprompt_sanity(self):
-        assert util.reprompt(text='foo') == util.respond(reprompt_text='foo', end_session=False)
-        assert util.reprompt(ssml='foo') == util.respond(reprompt_ssml='foo', end_session=False)
+        assert util.reprompt(text='foo') == util.respond(reprompt_text='foo', end_session=False)  # noqa
+        assert util.reprompt(ssml='foo') == util.respond(reprompt_ssml='foo', end_session=False)  # noqa
 
 
 class TestValidateTimestamp:
@@ -166,3 +166,17 @@ class TestValidateCertificate:
         for case in cases:
             assert util._get_certificate(case) is None
             assert self.last_log() == 'certificate expired or invalid\n'
+
+    def test_request_validation(self):
+        cert_url = 'https://s3.amazonaws.com/echo.api/echo-api-cert-4.pem'
+        sig = 'biCfiVPY/AfFHPLz3s6msyoSWewJzQo0jZxsrSelEvVw1RlZ9ehxoREB/iUK+PD2rzO+z1SdP3RlOabMf6eHCvkG1G3SJY13Q00lVbmabJVOcNGObvxuWHD0oUtdfPKSzcUok2cEiAiMtI+OkXNoCkji4kxHPx1+nvfPhNhoakALCLqEYNYTm3ifNt5WbfYe8TC+5U86+U8Bv/Xl5jaUDT9CzCjR0KEqI1Sw1tWrTGZt857Zzx0ZkF3jdD8Ljdet2d64pzkyX+Ig/91PQQt4VEvfbGcjDc32Ic3RjMTCW5amd22Bs0uWLdzn8luOh6wg2WvVbE2ME8FsvUVCEtCCSQ=='
+        headers = {'SignatureCertChainUrl': cert_url, 'Signature': sig}
+
+        # Valid data
+        data =  b'{"version":"1.0","session":{"new":true,"sessionId":"SessionId.a5a7c87a-4274-45bc-ac16-fb1bc02b93e4","application":{"applicationId":"amzn1.ask.skill.d4ed8492-e5ca-47f7-86d2-103d6a918c00"},"attributes":{},"user":{"userId":"amzn1.ask.account.AHVZCEBJIIIE32N24P522JWAJBM4W2CWOZVP5R74WC6LBMHQG4NPDV4CXCHV5FONOGH3WMOUYN7QWB5BIEYR26RT3VBZIRWF77ZEQZT2E23CSAYHCFWYH4NUSD7R522J2C6TCWOEFSHXTHTN3J77Z5KNEC4IHNXBJZGZELWKI5YR4KIDEXQZDOTLTK4WDREGVGVAQK73734BCYA"}},"request":{"type":"LaunchRequest","requestId":"EdwRequestId.5399ce92-0424-4dd4-b434-40213b4cd2c9","timestamp":"2016-12-28T05:59:13Z","locale":"en-US"}}'
+        assert util.validate_request_certificate(headers, data) is True
+
+        # Invalid data (timestamp altered by 1 second)
+        data =  b'{"version":"1.0","session":{"new":true,"sessionId":"SessionId.a5a7c87a-4274-45bc-ac16-fb1bc02b93e4","application":{"applicationId":"amzn1.ask.skill.d4ed8492-e5ca-47f7-86d2-103d6a918c00"},"attributes":{},"user":{"userId":"amzn1.ask.account.AHVZCEBJIIIE32N24P522JWAJBM4W2CWOZVP5R74WC6LBMHQG4NPDV4CXCHV5FONOGH3WMOUYN7QWB5BIEYR26RT3VBZIRWF77ZEQZT2E23CSAYHCFWYH4NUSD7R522J2C6TCWOEFSHXTHTN3J77Z5KNEC4IHNXBJZGZELWKI5YR4KIDEXQZDOTLTK4WDREGVGVAQK73734BCYA"}},"request":{"type":"LaunchRequest","requestId":"EdwRequestId.5399ce92-0424-4dd4-b434-40213b4cd2c9","timestamp":"2016-12-28T05:59:14Z","locale":"en-US"}}'
+        assert util.validate_request_certificate(headers, data) is False
+        assert self.last_log() == 'invalid request signature\n'

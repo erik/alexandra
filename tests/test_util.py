@@ -6,6 +6,8 @@ except:
 import datetime as dt
 import logging
 
+import pytest
+
 from alexandra import util
 
 
@@ -167,7 +169,9 @@ class TestValidateCertificate:
             assert util._get_certificate(case) is None
             assert self.last_log() == 'certificate expired or invalid\n'
 
+    @pytest.mark.skip
     def test_request_validation(self):
+        '''This test is disabled due to echo-api-cert-4 having expired.'''
         cert_url = 'https://s3.amazonaws.com/echo.api/echo-api-cert-4.pem'
         sig = 'biCfiVPY/AfFHPLz3s6msyoSWewJzQo0jZxsrSelEvVw1RlZ9ehxoREB/iUK+PD2rzO+z1SdP3RlOabMf6eHCvkG1G3SJY13Q00lVbmabJVOcNGObvxuWHD0oUtdfPKSzcUok2cEiAiMtI+OkXNoCkji4kxHPx1+nvfPhNhoakALCLqEYNYTm3ifNt5WbfYe8TC+5U86+U8Bv/Xl5jaUDT9CzCjR0KEqI1Sw1tWrTGZt857Zzx0ZkF3jdD8Ljdet2d64pzkyX+Ig/91PQQt4VEvfbGcjDc32Ic3RjMTCW5amd22Bs0uWLdzn8luOh6wg2WvVbE2ME8FsvUVCEtCCSQ=='
         headers = {'SignatureCertChainUrl': cert_url, 'Signature': sig}

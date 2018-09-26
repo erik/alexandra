@@ -164,7 +164,7 @@ def _get_certificate(cert_url):
     # Sanity check location so we don't get some random person's cert.
     if url.scheme != 'https' or \
        host not in ['s3.amazonaws.com', 's3.amazonaws.com:443'] or \
-       not path.startswith('/echo.api/'):
+       not path.startswith(os.sep + 'echo.api' + os.sep ):
         log.error('invalid cert location %s', cert_url)
         return
 

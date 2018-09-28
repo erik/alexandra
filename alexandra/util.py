@@ -2,7 +2,7 @@
 
 import base64
 import logging
-import os.path
+import posixpath
 
 try:
     from urlparse import urlparse
@@ -159,7 +159,7 @@ def _get_certificate(cert_url):
 
     url = urlparse(cert_url)
     host = url.netloc.lower()
-    path = os.path.normpath(url.path)
+    path = posixpath.normpath(url.path)
 
     # Sanity check location so we don't get some random person's cert.
     if url.scheme != 'https' or \

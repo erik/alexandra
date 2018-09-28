@@ -151,6 +151,7 @@ class TestValidateCertificate:
             'https://s3.amazonaws.com/EcHo.aPi/echo-api-cert.pem',
             'https://s3.amazonaws.com/invalid.path/echo-api-cert.pem',
             'https://s3.amazonaws.com:563/echo.api/echo-api-cert.pem',
+            'https://s3.amazonaws.com:443/echo.api/../echo-api-cert.pem',
         ]
 
         for case in cases:

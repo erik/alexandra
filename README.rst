@@ -4,7 +4,7 @@ alexandra
 |Build Status|
 
 Minimal Python library to remove the tedious boilerplate-y parts of
-writing Alexa skills. Alexandra is tested against Python 2.7 and 3.5.1.
+writing Alexa skills. Alexandra is tested against Python 2.7 and 3.6.
 
 Alexandra can be used as part of an AWS lambda function or a self-hosted
 server. There's a builtin WSGI app if you're in to that kind of thing.

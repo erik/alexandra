@@ -67,6 +67,12 @@ class Application:
                 body['request']['intent'].get('slots', {}).items()
             }
 
+            ids = {
+                id_['id']: id_.get('value')
+                for _, id_ in
+                body['request']['intent'].get('slots', {}).items() if id_.get('id')
+            }
+
             arity = intent_fn.__code__.co_argcount
 
             if arity == 2:
@@ -107,6 +113,10 @@ class Application:
             def foo_bar_baz_intent(slots, session):
                 pass
 
+            @alexa_app.intent('BazFooBar')
+            def foo_bar_baz_intent(slots, ids, session):
+                pass
+
             @alexa_app.intent('NoArgs')
             def noargs_intent():
                 pass
@@ -116,8 +126,8 @@ class Application:
         def _decorator(func):
             arity = func.__code__.co_argcount
 
-            if arity not in [0, 2]:
-                raise ValueError("expected 0 or 2 argument function")
+            if arity not in [0, 2, 3]:
+                raise ValueError("expected 0, 2 or 3 argument function")
 
             self.intent_map[intent_name] = func
             return func

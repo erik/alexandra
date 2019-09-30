@@ -20,7 +20,7 @@ setup(
     license='ISC',
     test_requires=['tox'],
     install_requires=[
-        'Werkzeug==0.11.4',
+        'Werkzeug==0.15.3',
         'pyOpenssl==17.5.0'
     ]
 )
